@@ -5,30 +5,27 @@ class D3Viz extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      N: 100,
-      d: 0,
-      r: 0,
-      inCount: 0,
-      totalCount: 0,
+      N: 10000,
+      speed: 0,
+      pi: 0,
+      r:0,
+      // inCount: 0,
+      // totalCount: 0,
       squareColor: '#FF1493',
-      circleColor: '#0000FF',
-      pi: 0
+      circleColor: '#0000FF'
     };
-    this.createSimulation = this.createSimulation.bind(this);
+    this.setUp = this.setUp.bind(this);
     this.runSimulation = this.runSimulation.bind(this);
     this.sleep = this.sleep.bind(this);
   }
 
   componentDidMount() {
-    this.createSimulation();
+    this.setUp();
   }
 
   // REVISE
-  createSimulation() {
-    // reset svg
-    console.log(this)
+  setUp() {
     const node = this.node;
-    console.log(node)
     select(node).html('');
 
     const d = Math.min(this.props.height, this.props.width);
@@ -36,7 +33,7 @@ class D3Viz extends React.Component {
     const cx = this.props.width / 2;
     const cy = this.props.height / 2;
 
-    this.setState({d: d, r:r})
+    this.setState({r:r})
 
     // append circle
     select(node).append('circle')
@@ -75,49 +72,43 @@ class D3Viz extends React.Component {
     let innerCount = 0
     let piCalc = 0
 
-    for (let i = 0; i < 3000; i++) {
-      await this.sleep(0)
+    for (let i = 0; i < this.state.N; i++) {
+      await this.sleep(this.state.speed)
       totCount+=1
       // this.setState({totalCount: this.state.totalCount++})
       randNums = getRandXY()
-      randX = randNums[0] * 150
-      randY = randNums[1] * 150
+      randX = randNums[0] * 300.0
+      randY = randNums[1] * 300.0
       console.log(randX)
       console.log(randY)
 
-      console.log((randX * randX) + (randY * randY))
-
-      if ((randX * randX) + (randY * randY) < (this.state.r * this.state.r)) {
-        console.log("inside the circle")
-        // this.setState({inCount: this.state.inCount++})
-        innerCount+=1
-      }
-      
-      else console.log("outside the circle")
+      let insideCirc = Math.pow(randX - 150, 2) + Math.pow(randY - 150, 2) < (this.state.r * this.state.r)
+      if (insideCirc) innerCount+=1
 
       select(node).append('circle')
-        .attr('cx', randX*2)
-        .attr('cy', randY*2)
-        .attr('r', 3)
-      // .style('fill', this.isIn(p) ? this.state.circleColor : this.state.squareColor);
+        .attr('cx', randX)
+        .attr('cy', randY)
+        .attr('r', 1.5)
+        .style('fill', insideCirc ? this.state.circleColor : this.state.squareColor);
 
-      // this.setState({ pi: (4.0 * (this.state.inCount / this.state.totalCount)) })
-      // console.log(this.state.pi)
       console.log("Inner count: " + innerCount + " Total count: " + totCount)
       piCalc = (4.0 * (innerCount/totCount))
+      this.setState({pi: (4.0 * (innerCount/totCount))})
       console.log(piCalc)
-
-
     }
   }
-
 
   render() {
 
     return (
       <div className="App">
-        <p>Vizualization</p>
+        <h3>Pie = 4*(N inner / N total)</h3>
+        <h3>Pi: {this.state.pi}</h3>
+        <p></p>
+
         <button onClick={this.runSimulation}>Start Simulation</button>
+        <br />
+        <br />
         <svg ref={node => this.node = node}
           width={this.props.width} height={this.props.height}>
         </svg>
