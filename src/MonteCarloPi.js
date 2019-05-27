@@ -7,6 +7,7 @@ class MonteCarloPi extends React.Component {
         this.getRandXY = this.getRandXY.bind(this);
         this.generateNewPoints = this.generateNewPoints.bind(this);
         this.stopSim = this.stopSim.bind(this);
+        this.sleep = this.sleep.bind(this);
     }
 
     getRandXY() {
@@ -15,10 +16,15 @@ class MonteCarloPi extends React.Component {
         return [x, y];
     }
 
-    generateNewPoints() {
+    sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+      }
+
+    async generateNewPoints() {
         let randNums, randX, randY, pi = 0
 
         for(let i=0;i<1000;i++) {
+            await this.sleep(0)
             this.state.total++
             randNums = this.getRandXY()
             randX = randNums[0]
