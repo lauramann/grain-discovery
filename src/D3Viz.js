@@ -16,6 +16,7 @@ class D3Viz extends React.Component {
     };
     this.createSimulation = this.createSimulation.bind(this);
     this.runSimulation = this.runSimulation.bind(this);
+    this.sleep = this.sleep.bind(this);
   }
 
   componentDidMount() {
@@ -55,7 +56,12 @@ class D3Viz extends React.Component {
       .style('fill', 'none');
   }
 
-  runSimulation() {
+  // Sleep function taken from https://davidwalsh.name/javascript-sleep-function
+  sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  async runSimulation() {
     const node = this.node
 
     function getRandXY() {
@@ -70,7 +76,7 @@ class D3Viz extends React.Component {
     let piCalc = 0
 
     for (let i = 0; i < 3000; i++) {
-      // await this.sleep(0)
+      await this.sleep(0)
       totCount+=1
       // this.setState({totalCount: this.state.totalCount++})
       randNums = getRandXY()
