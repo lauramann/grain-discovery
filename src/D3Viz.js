@@ -16,8 +16,6 @@ class D3Viz extends React.Component {
       run: true,
       sliderVal: 100,
       input: '1000',
-      // inCount: 0,
-      // totalCount: 0,
       squareColor: '#7F5AD1',
       circleColor: '#ACD15A'
     };
@@ -109,14 +107,11 @@ class D3Viz extends React.Component {
       i--
       await this.sleep(this.state.sliderVal)
       totCount += 1
-      // this.setState({totalCount: this.state.totalCount++})
       randNums = getRandXY()
       randX = randNums[0] * this.props.width
       randY = randNums[1] * this.props.width
-      // console.log(randX)
-      // console.log(randY)
 
-      let insideCirc = Math.pow(randX - (this.props.width/2), 2) + Math.pow(randY - (this.props.width/2), 2) < (this.state.r * this.state.r)
+      let insideCirc = Math.pow(randX - (this.props.width / 2), 2) + Math.pow(randY - (this.props.width / 2), 2) < (this.state.r * this.state.r)
       if (insideCirc) innerCount += 1
 
       if (this.state.run) {
@@ -126,9 +121,7 @@ class D3Viz extends React.Component {
           .attr('r', 1.5)
           .style('fill', insideCirc ? this.state.circleColor : this.state.squareColor);
 
-        // console.log("Inner count: " + innerCount + " Total count: " + totCount)
         this.setState({ pi: (4.0 * (innerCount / totCount)) })
-        // console.log(piCalc)
       }
     } while (this.state.run && i)
 
@@ -144,54 +137,60 @@ class D3Viz extends React.Component {
     return (
       <div className="App">
         <div className="left-side">
-        <Typography variant="body2" gutterBottom>
-        The value of Pi can be estimated by using a Monte Carlo Simulation.
-        When we use a square with side length n and a circle with diameter n, and we generate 
-        random points inside the square, we can calculate the probability that
-         the point will be inside the circle as: 
+          <Typography variant="body2" gutterBottom>
+            The value of Pi can be estimated by using a Monte Carlo Simulation.
+            When we use a square with side length n and a circle with diameter n, and we generate
+            random points inside the square, we can calculate the probability that
+             the point will be inside the circle as:
       </Typography>
-      <Typography className="center-bold" variant="body1" gutterBottom>Pr(inside circle) = π/4</Typography>
-      <Typography variant="body2" gutterBottom>
-        Therefore, we can estimate Pi by calculating: 
+          <Typography className="center-bold" variant="body1" gutterBottom>Pr(inside circle) = π/4</Typography>
+          <Typography variant="body2" gutterBottom>
+            Therefore, we can estimate Pi by calculating:
       </Typography>
-      <Typography className="center-bold" variant="body1" gutterBottom>π = 4 * (# inner points / # total points)</Typography>
-      <Typography className="center-bold" variant="h5" gutterBottom>
-      π : {this.state.pi.toFixed(4)}
-      </Typography>
-        {/* <h3 id="pi">Pi: {this.state.pi.toFixed(4)}</h3>
-        <p></p> */}
+          <Typography className="center-bold" variant="body1" gutterBottom>π = 4 * (# inner points / # total points)</Typography>
+          <Typography className="center-bold" variant="h5" gutterBottom>
+            π : {this.state.pi.toFixed(4)}
+          </Typography>
+          <div className="inputs">
+            <div className="left-input">
+              <TextField
+                id="outlined-name"
+                label="Num Iterations"
+                defaultValue="1000"
+                value={null}
+                onChange={this.inputChange}
+                margin="normal"
+                variant="outlined"
+              />
+            </div>
+            <div className="right-input">
+              <Typography variant="body1" gutterBottom>Speed</Typography>
+              <Slider
+                value={this.state.sliderVal}
+                aria-labelledby="label"
+                onChange={this.handleChange}
+              />
+            </div>
 
-        <TextField
-          id="filled-name"
-          label="Num"
-          defaultValue="1000"
-          value={null}
-          onChange={this.inputChange}
-          margin="normal"
-          variant="filled"
-        />
-        <div style={{ width: "300px" }}>
+          </div>
 
-          <Slider
-            value={this.state.sliderVal}
-            aria-labelledby="label"
-            onChange={this.handleChange}
-          />
-        </div>
-        <Button onClick={this.runSimulation} variant="contained">
-          Start Simulation
+          <div className="buttons">
+          <Button id="start-button" onClick={this.runSimulation} variant="contained">
+            Start Simulation
       </Button>
-      <Button onClick={this.resetSimulation} variant="contained">
-          Reset
+          <Button id="reset-button" onClick={this.resetSimulation} variant="contained">
+            Reset
       </Button>
+          </div>
+          
         </div>
         <div className="right-side">
-        <svg ref={node => this.node = node}
-          width={this.props.width} height={this.props.height}>
-        </svg>
+          <svg ref={node => this.node = node}
+            width={this.props.width} height={this.props.height}>
+          </svg>
         </div>
 
-        
+
       </div>
     );
   }

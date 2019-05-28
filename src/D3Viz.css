@@ -21,3 +21,42 @@
     vertical-align: top;
     margin-left: 20px;
 }
+
+.MuiSlider-container {
+    display: inline;
+}
+
+#outlined-name {
+    width:100px;
+}
+
+.inputs {
+    text-align: center;
+}
+
+.left-input {
+    text-align: left;
+    display: inline-block; 
+    vertical-align: top;
+    width:100px;
+    margin-right: 10%;
+}
+
+.right-input {
+    text-align: left;
+    display: inline-block; 
+    vertical-align: top;
+    width:150px;
+    margin-left: 10%;
+}
+
+.buttons {
+    width: 400px;
+    margin-top: 20px;
+}
+
+#start-button {
+    float: left;
+    margin-right: 10%;
+    margin-left: 15%;
+}
