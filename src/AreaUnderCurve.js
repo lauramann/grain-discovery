@@ -14,7 +14,9 @@ class AreaUnderCurve extends React.Component {
         sliderVal: 100,
         numIter: '1000',
         squareColor: '#7F5AD1',
-        circleColor: '#ACD15A'
+        circleColor: '#ACD15A',
+        innerCount: 0,
+        totCount: 0,
       };
   
       this.setUp = this.setUp.bind(this);
@@ -24,7 +26,8 @@ class AreaUnderCurve extends React.Component {
       this.handleSliderChange = this.handleSliderChange.bind(this);
       this.handleNumIterChange = this.handleNumIterChange.bind(this);
       this.getRandXY = this.getRandXY.bind(this);
-    //   this.insideCirc = this.insideCirc.bind(this);
+      this.f = this.f.bind(this);
+      this.underCurve = this.underCurve.bind(this);
       }
   
     componentDidMount() {
@@ -38,6 +41,12 @@ class AreaUnderCurve extends React.Component {
     handleNumIterChange = (event) => {
       this.setState({ numIter: event.target.value })
     }
+
+    f(x) {
+            
+            return Math.pow(x, Math.cos(x)) + 2
+        }
+    
   
     setUp() {
       const node = this.node;
@@ -64,17 +73,22 @@ class AreaUnderCurve extends React.Component {
             .attr('r', 5)
             .style('fill', '#7F5AD1');
 
-        function f(x) {
-            return Math.pow(x, Math.cos(x)) + 2
-        }
 
         let lineData = [...Array(d).keys()]
         console.log(lineData)
 
-        let scale = 50
+        let scale = 1
+
+        let f = this.f
+
+        // function f(x) {
+            
+        //     return Math.pow(x, Math.cos(x)) + 2
+        // }
+
         let lineFunction = d3.line()
-            .x(function(x) { return (x/10 * scale);})
-            .y(function(x) { return d - (f(x/10)) * scale; })
+            .x(function(x) { return (x/1 * scale);})
+            .y(function(x) { return d - (f(x/1)) * scale; })
         
             select(node).append("path")
                 .attr("d", lineFunction(lineData))
@@ -101,10 +115,14 @@ class AreaUnderCurve extends React.Component {
       return [x, y];
     }
   
-    // insideCirc(x, y) {
-    //   let r = this.state.radius
-    //   return Math.pow(x - r, 2) + Math.pow(y - r, 2) < Math.pow(r, 2)
-    // }
+    underCurve(x, y) {
+    let res = this.f(x)
+    console.log("result: " + res)
+    console.log("y: " + y)
+    if(y<res) console.log("under curve")
+    else console.log("above curve")
+      return (y < res)
+    }
   
   
     async runSimulation() {
@@ -124,16 +142,18 @@ class AreaUnderCurve extends React.Component {
         randNums = this.getRandXY()
         randX = randNums[0] * this.props.width
         randY = randNums[1] * this.props.width
-        let inCircle = this.insideCirc(randX, randY)
+        let unCurve = this.underCurve(randX, randY)
   
-        if (inCircle) innerCount += 1
+        if (unCurve) innerCount += 1
+        console.log(innerCount)
+        this.setState({innerCount: innerCount, totCount: totCount})
   
         if (this.state.run) {
           select(node).append('circle')
             .attr('cx', randX)
-            .attr('cy', randY)
+            .attr('cy', this.props.height - randY)
             .attr('r', 1.5)
-            .style('fill', inCircle ? this.state.circleColor : this.state.squareColor);
+            .style('fill', unCurve ? this.state.circleColor : this.state.squareColor);
   
         //   this.setState({ pi: (4.0 * (innerCount / totCount)) })
         }
@@ -160,9 +180,12 @@ class AreaUnderCurve extends React.Component {
               Therefore, we can estimate Pi by calculating:
         </Typography>
             <Typography className="center-bold" variant="body1" gutterBottom>π = 4 * (# inner points / # total points)</Typography>
-            {/* <Typography className="center-bold" variant="h5" gutterBottom>
-              {/* π : {this.state.pi.toFixed(4)} */}
-            {/* </Typography> */} */}
+            <Typography className="center-bold" variant="h5" gutterBottom>
+              Total In: {this.state.innerCount}
+            </Typography>
+            <Typography className="center-bold" variant="h5" gutterBottom>
+              Total Out: {this.state.totCount}
+            </Typography>
             <div className="inputs">
               <div className="left-input">
                 <TextField
