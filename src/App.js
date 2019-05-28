@@ -8,7 +8,9 @@ class App extends React.Component {
   render() {
     return (
       <div className="App">
-        <MonteCarloPi />
+          <h1>Area Under the Curve</h1>
+        {/* <MonteCarloPi /> */}
+        <AreaUnderCurve width={500} height={500} />
       </div>
     );
   }
