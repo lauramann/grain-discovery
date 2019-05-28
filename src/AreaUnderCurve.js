@@ -17,6 +17,10 @@ class AreaUnderCurve extends React.Component {
         circleColor: '#ACD15A',
         innerCount: 0,
         totCount: 0,
+        // zoomFactor: 50,
+        startPoint: 0,
+        endPoint: 20,
+        maxy: 0
       };
   
       this.setUp = this.setUp.bind(this);
@@ -43,7 +47,7 @@ class AreaUnderCurve extends React.Component {
     }
 
     f(x) {
-            
+            // return Math.pow(x, 2)
             return Math.pow(x, Math.cos(x)) + 2
         }
     
@@ -67,28 +71,40 @@ class AreaUnderCurve extends React.Component {
         .style('stroke', this.state.squareColor)
         .style('fill', 'none');
 
-        select(node).append('circle')
-            .attr('cx', 500)
-            .attr('cy', d-500)
-            .attr('r', 5)
-            .style('fill', '#7F5AD1');
+        // let lineData = [...Array(d).keys()]
+        let lineData = []
+        let tempMax = 0
 
+        for (let i = this.state.startPoint; i <= this.state.endPoint; i++){
+            let yCalc = this.f(i)
+            console.log(yCalc + ' thecalc')
+            if (yCalc>tempMax) {
+                tempMax = yCalc
+                // console.log('ycalc is greater than maxy')
+                // this.setState({maxy: yCalc})
+                // console.log(this.state.maxy)
+            
+        }
 
-        let lineData = [...Array(d).keys()]
+            lineData.push({x: i, y: yCalc})
+        }
+
+        console.log(tempMax)
+        this.setState({maxy: tempMax})
+
         console.log(lineData)
-
-        let scale = 1
+        console.log('maxy', this.state.maxy)
 
         let f = this.f
+        let maxy = tempMax
 
-        // function f(x) {
-            
-        //     return Math.pow(x, Math.cos(x)) + 2
-        // }
-
+        let h = this.props.height
+        let xscale = 1 / this.state.endPoint * this.props.width
+        // let zoomFactor = this.state.zoomFactor
+// this.props.height - (randY / this.state.maxy) * this.props.height
         let lineFunction = d3.line()
-            .x(function(x) { return (x/1 * scale);})
-            .y(function(x) { return d - (f(x/1)) * scale; })
+            .x(function(d) { return (d.x * xscale);})
+            .y(function(d) { return h - d.y/maxy * h; })
         
             select(node).append("path")
                 .attr("d", lineFunction(lineData))
@@ -110,8 +126,9 @@ class AreaUnderCurve extends React.Component {
     }
   
     getRandXY() {
-      let x = Math.random()
-      let y = Math.random()
+      let x = Math.random() * this.state.endPoint
+      let y = Math.random() * this.state.maxy
+      console.log(x, y)
       return [x, y];
     }
   
@@ -140,8 +157,8 @@ class AreaUnderCurve extends React.Component {
   
         totCount += 1
         randNums = this.getRandXY()
-        randX = randNums[0] * this.props.width
-        randY = randNums[1] * this.props.width
+        randX = randNums[0] 
+        randY = randNums[1] 
         let unCurve = this.underCurve(randX, randY)
   
         if (unCurve) innerCount += 1
@@ -150,8 +167,8 @@ class AreaUnderCurve extends React.Component {
   
         if (this.state.run) {
           select(node).append('circle')
-            .attr('cx', randX)
-            .attr('cy', this.props.height - randY)
+            .attr('cx', randX / this.state.endPoint * this.props.width)
+            .attr('cy', this.props.height - (randY / this.state.maxy) * this.props.height)
             .attr('r', 1.5)
             .style('fill', unCurve ? this.state.circleColor : this.state.squareColor);
   
