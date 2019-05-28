@@ -1,9 +1,7 @@
 import React from 'react';
 import { select } from 'd3-selection'
 import Slider from '@material-ui/lab/Slider';
-import TextField from '@material-ui/core/TextField';
-import Button from '@material-ui/core/Button';
-import Typography from '@material-ui/core/Typography';
+import {TextField, Button, Typography} from '@material-ui/core';
 import './D3Viz.css';
 
 class D3Viz extends React.Component {
@@ -11,7 +9,7 @@ class D3Viz extends React.Component {
     super(props);
     this.state = {
       pi: 0,
-      r: 0,
+      radius: 0,
       run: true,
       sliderVal: 100,
       numIter: '1000',
@@ -19,31 +17,28 @@ class D3Viz extends React.Component {
       circleColor: '#ACD15A'
     };
 
-    // function declarations
     this.setUp = this.setUp.bind(this);
     this.runSimulation = this.runSimulation.bind(this);
     this.sleep = this.sleep.bind(this);
     this.resetSimulation = this.resetSimulation.bind(this);
-    this.handleChange = this.handleChange.bind(this);
-    this.inputChange = this.inputChange.bind(this);
-  }
+    this.handleSliderChange = this.handleSliderChange.bind(this);
+    this.handleNumIterChange = this.handleNumIterChange.bind(this);
+    this.getRandXY = this.getRandXY.bind(this);
+    this.insideCirc = this.insideCirc.bind(this);
+    }
 
-  // create d3 node (circle and square)
   componentDidMount() {
     this.setUp();
   }
 
-  // handles when user changes speed slider
-  handleChange = (event, value) => {
+  handleSliderChange = (event, value) => {
     this.setState({ sliderVal: value });
   };
 
-  // handles when user enters new numIter value
-  inputChange = (event) => {
+  handleNumIterChange = (event) => {
     this.setState({ numIter: event.target.value })
   }
 
-  // setUp function creates d3 node (circle and square)
   setUp() {
     const node = this.node;
     select(node).html('');
@@ -53,9 +48,8 @@ class D3Viz extends React.Component {
     const cx = this.props.width / 2;
     const cy = this.props.height / 2;
 
-    this.setState({ r: r })
+    this.setState({ radius: r })
 
-    // append circle
     select(node).append('circle')
       .attr('cx', cx)
       .attr('cy', cy)
@@ -63,7 +57,6 @@ class D3Viz extends React.Component {
       .style('stroke', this.state.circleColor)
       .style('fill', 'none');
 
-    // append square
     select(node).append('rect')
       .attr('width', d)
       .attr('height', d)
@@ -77,14 +70,25 @@ class D3Viz extends React.Component {
   // Takes number from slider value (0-100) and converts to corresponding speed
   sleep(ms) {
     let speed = 0
-    if (ms == 0) speed = 1000
-    else if (ms == 100) speed = 0
+    if (ms === 0) speed = 1000
+    else if (ms === 100) speed = 0
     else speed = (100 - ms) * 5
 
     return new Promise(resolve => setTimeout(resolve, speed));
   }
 
-  // runSimulation function starts the simulation
+  getRandXY() {
+    let x = Math.random()
+    let y = Math.random()
+    return [x, y];
+  }
+
+  insideCirc(x, y) {
+    let r = this.state.radius
+    return Math.pow(x - r, 2) + Math.pow(y - r, 2) < Math.pow(r, 2)
+  }
+
+
   async runSimulation() {
     this.setUp()
     this.setState({ run: true })
@@ -94,49 +98,32 @@ class D3Viz extends React.Component {
     let totCount = 0
     let i = this.state.numIter
 
-    // generate random numbers for x & y
-    function getRandXY() {
-      let x = Math.random()
-      let y = Math.random()
-      return [x, y];
-    }
-
-    // While num iterations not at 0...
     do {
       i--
-      // sleep depending on what user sets slider value
       await this.sleep(this.state.sliderVal)
 
       totCount += 1
-      randNums = getRandXY()
+      randNums = this.getRandXY()
       randX = randNums[0] * this.props.width
       randY = randNums[1] * this.props.width
+      let inCircle = this.insideCirc(randX, randY)
 
-      // Calculate whether random point is inside circle
-      // If it is, increase innerCount
-      let insideCirc = Math.pow(randX - (this.props.width / 2), 2) + Math.pow(randY - (this.props.width / 2), 2) < (this.state.r * this.state.r)
-      if (insideCirc) innerCount += 1
+      if (inCircle) innerCount += 1
 
-      // append dot onto d3 node
       if (this.state.run) {
         select(node).append('circle')
           .attr('cx', randX)
           .attr('cy', randY)
           .attr('r', 1.5)
-          .style('fill', insideCirc ? this.state.circleColor : this.state.squareColor);
+          .style('fill', inCircle ? this.state.circleColor : this.state.squareColor);
 
-        // calculate updated pi value
         this.setState({ pi: (4.0 * (innerCount / totCount)) })
       }
     } while (this.state.run && i)
   }
 
-  // resetSimulation function resets simulation
   resetSimulation() {
-    // stop running and set pi to 0
     this.setState({ run: false, pi: 0 })
-
-    //clear the d3 viz
     this.setUp();
   }
 
@@ -165,7 +152,7 @@ class D3Viz extends React.Component {
                 label="Num Iterations"
                 defaultValue="1000"
                 type="number"
-                onChange={this.inputChange}
+                onChange={this.handleNumIterChange}
                 margin="normal"
                 variant="outlined"
               />
@@ -175,7 +162,7 @@ class D3Viz extends React.Component {
               <Slider
                 value={this.state.sliderVal}
                 aria-labelledby="label"
-                onChange={this.handleChange}
+                onChange={this.handleSliderChange}
               />
             </div>
           </div>
