@@ -2,9 +2,6 @@ import React from 'react';
 import D3Viz from './D3Viz';
 
 class MonteCarloPi extends React.Component {
-    constructor(props) {
-        super(props);
-    }
 
     render() {
 
