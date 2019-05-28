@@ -8,7 +8,7 @@ class MonteCarloPi extends React.Component {
         return (
             <div className="App">
                 <h1>Monte Carlo Pi Simulation</h1>
-                <D3Viz width={300} height={300} />
+                <D3Viz width={500} height={500} />
             </div>
         );
     }

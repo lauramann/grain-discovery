@@ -1,0 +1,23 @@
+.App {
+    text-align: center;
+}
+
+.left-side {
+    text-align: left;
+    display: inline-block; 
+    vertical-align: top;
+    margin-right: 20px;
+    font-family: 'Inconsolata', monospace;
+    width:400px
+}
+
+.center-bold {
+    text-align: center;
+    font-weight: 700;
+}
+
+.right-side {
+    display: inline-block; 
+    vertical-align: top;
+    margin-left: 20px;
+}

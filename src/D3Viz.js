@@ -2,6 +2,9 @@ import React from 'react';
 import { select } from 'd3-selection'
 import Slider from '@material-ui/lab/Slider';
 import TextField from '@material-ui/core/TextField';
+import Button from '@material-ui/core/Button';
+import Typography from '@material-ui/core/Typography';
+import './D3Viz.css';
 
 class D3Viz extends React.Component {
   constructor(props) {
@@ -15,8 +18,8 @@ class D3Viz extends React.Component {
       input: '1000',
       // inCount: 0,
       // totalCount: 0,
-      squareColor: '#FF1493',
-      circleColor: '#0000FF'
+      squareColor: '#7F5AD1',
+      circleColor: '#ACD15A'
     };
     this.setUp = this.setUp.bind(this);
     this.runSimulation = this.runSimulation.bind(this);
@@ -108,12 +111,12 @@ class D3Viz extends React.Component {
       totCount += 1
       // this.setState({totalCount: this.state.totalCount++})
       randNums = getRandXY()
-      randX = randNums[0] * 300.0
-      randY = randNums[1] * 300.0
+      randX = randNums[0] * this.props.width
+      randY = randNums[1] * this.props.width
       // console.log(randX)
       // console.log(randY)
 
-      let insideCirc = Math.pow(randX - 150, 2) + Math.pow(randY - 150, 2) < (this.state.r * this.state.r)
+      let insideCirc = Math.pow(randX - (this.props.width/2), 2) + Math.pow(randY - (this.props.width/2), 2) < (this.state.r * this.state.r)
       if (insideCirc) innerCount += 1
 
       if (this.state.run) {
@@ -140,9 +143,23 @@ class D3Viz extends React.Component {
 
     return (
       <div className="App">
-        <h3>Pi = 4*(N inner / N total)</h3>
-        <h3 id="pi">Pi: {this.state.pi.toFixed(4)}</h3>
-        <p></p>
+        <div className="left-side">
+        <Typography variant="body2" gutterBottom>
+        The value of Pi can be estimated by using a Monte Carlo Simulation.
+        When we use a square with side length n and a circle with diameter n, and we generate 
+        random points inside the square, we can calculate the probability that
+         the point will be inside the circle as: 
+      </Typography>
+      <Typography className="center-bold" variant="body1" gutterBottom>Pr(inside circle) = π/4</Typography>
+      <Typography variant="body2" gutterBottom>
+        Therefore, we can estimate Pi by calculating: 
+      </Typography>
+      <Typography className="center-bold" variant="body1" gutterBottom>π = 4 * (# inner points / # total points)</Typography>
+      <Typography className="center-bold" variant="h5" gutterBottom>
+      π : {this.state.pi.toFixed(4)}
+      </Typography>
+        {/* <h3 id="pi">Pi: {this.state.pi.toFixed(4)}</h3>
+        <p></p> */}
 
         <TextField
           id="filled-name"
@@ -161,13 +178,20 @@ class D3Viz extends React.Component {
             onChange={this.handleChange}
           />
         </div>
-        <button onClick={this.runSimulation}>Start Simulation</button>
-        <button onClick={this.resetSimulation}>Reset</button>
-        <br />
-        <br />
+        <Button onClick={this.runSimulation} variant="contained">
+          Start Simulation
+      </Button>
+      <Button onClick={this.resetSimulation} variant="contained">
+          Reset
+      </Button>
+        </div>
+        <div className="right-side">
         <svg ref={node => this.node = node}
           width={this.props.width} height={this.props.height}>
         </svg>
+        </div>
+
+        
       </div>
     );
   }
