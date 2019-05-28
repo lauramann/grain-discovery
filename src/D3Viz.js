@@ -90,7 +90,8 @@ class D3Viz extends React.Component {
     this.setState({ run: true })
 
     const node = this.node
-    let randNums, randX, randY, totCount, innerCount = 0
+    let randNums, randX, randY, innerCount = 0
+    let totCount = 0
     let i = this.state.numIter
 
     // generate random numbers for x & y
@@ -163,7 +164,7 @@ class D3Viz extends React.Component {
                 id="outlined-name"
                 label="Num Iterations"
                 defaultValue="1000"
-                value={null}
+                type="number"
                 onChange={this.inputChange}
                 margin="normal"
                 variant="outlined"
