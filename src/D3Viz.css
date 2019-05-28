@@ -2,10 +2,13 @@
     text-align: center;
 }
 
-.left-side {
+.left-side, .right-side, .left-input, .right-input {
     text-align: left;
     display: inline-block; 
     vertical-align: top;
+}
+
+.left-side {
     margin-right: 20px;
     font-family: 'Inconsolata', monospace;
     width:400px
@@ -17,8 +20,6 @@
 }
 
 .right-side {
-    display: inline-block; 
-    vertical-align: top;
     margin-left: 20px;
 }
 
@@ -35,17 +36,11 @@
 }
 
 .left-input {
-    text-align: left;
-    display: inline-block; 
-    vertical-align: top;
     width:100px;
     margin-right: 10%;
 }
 
 .right-input {
-    text-align: left;
-    display: inline-block; 
-    vertical-align: top;
     width:150px;
     margin-left: 10%;
 }
