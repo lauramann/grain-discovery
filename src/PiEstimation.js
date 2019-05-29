@@ -2,9 +2,9 @@ import React from 'react';
 import { select } from 'd3-selection'
 import Slider from '@material-ui/lab/Slider';
 import {TextField, Button, Typography} from '@material-ui/core';
-import './D3Viz.css';
+import './PiEstimation.css';
 
-class D3Viz extends React.Component {
+class PiEstimation extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -130,6 +130,7 @@ class D3Viz extends React.Component {
   render() {
     return (
       <div className="App">
+        <Typography id="header1" variant="h1" gutterBottom>Pi Estimation Simulation</Typography>
         <div className="left-side">
           <Typography variant="body2" gutterBottom>
             The value of Pi can be estimated by using a Monte Carlo Simulation.
@@ -188,4 +189,4 @@ class D3Viz extends React.Component {
   }
 }
 
-export default D3Viz;
+export default PiEstimation;

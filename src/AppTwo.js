@@ -3,13 +3,13 @@ import { select } from 'd3-selection'
 import * as d3 from 'd3-shape';
 import Slider from '@material-ui/lab/Slider';
 import { TextField, Button, Typography } from '@material-ui/core';
-import './PiEstimation';
+import './D3Viz.css';
 
-class AreaUnderCurve extends React.Component {
+class AppTwo extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            radius: 0,
+            //BOTH
             run: true,
             sliderVal: 100,
             numIter: '1000',
@@ -17,12 +17,18 @@ class AreaUnderCurve extends React.Component {
             circleColor: '#ACD15A',
             innerCount: 0,
             totCount: 0,
-            // zoomFactor: 50,
+
+            //PI
+            radius: 0,
+
+            //AREA
+            //zoomFactor: 50,
             startPoint: 0,
             endPoint: 5,
             maxy: 0
         };
 
+        //BOTH
         this.setUp = this.setUp.bind(this);
         this.runSimulation = this.runSimulation.bind(this);
         this.sleep = this.sleep.bind(this);
@@ -30,8 +36,14 @@ class AreaUnderCurve extends React.Component {
         this.handleSliderChange = this.handleSliderChange.bind(this);
         this.handleNumIterChange = this.handleNumIterChange.bind(this);
         this.getRandXY = this.getRandXY.bind(this);
+
+        //PI
+        this.insideCirc = this.insideCirc.bind(this);
+
+        //AREA
         this.f = this.f.bind(this);
         this.underCurve = this.underCurve.bind(this);
+        this.areaSetup = this.areaSetup.bind(this);
     }
 
     componentDidMount() {
@@ -46,6 +58,7 @@ class AreaUnderCurve extends React.Component {
         this.setState({ numIter: event.target.value })
     }
 
+    //AREA
     f(x) {
         // return Math.pow(x, 2)
         return Math.pow(x, Math.cos(x)) + 2
@@ -58,8 +71,10 @@ class AreaUnderCurve extends React.Component {
 
         const d = Math.min(this.props.height, this.props.width);
         const r = d / 2;
-        //   const cx = this.props.width / 2;
-        //   const cy = this.props.height / 2;
+
+        //PI
+        const cx = this.props.width / 2;
+        const cy = this.props.height / 2;
 
         this.setState({ radius: r })
 
@@ -71,7 +86,24 @@ class AreaUnderCurve extends React.Component {
             .style('stroke', this.state.squareColor)
             .style('fill', 'none');
 
+        //PI
+        if (this.props.sim === 'pi') {
+            select(node).append('circle')
+                .attr('cx', cx)
+                .attr('cy', cy)
+                .attr('r', r)
+                .style('stroke', this.state.circleColor)
+                .style('fill', 'none');
+        }
 
+        if (this.props.sim === 'area') {
+            console.log("AREA")
+            this.areaSetup(node)
+        }
+
+    }
+
+    areaSetup(node) {
         let lineData = []
         let maxY = 0
 
@@ -117,12 +149,23 @@ class AreaUnderCurve extends React.Component {
     }
 
     getRandXY() {
+        //changed for area
+        let startPoint = this.state.startPoint
+        let endPoint = this.state.endPoint
+        let maxY = this.state.maxy
+
+        if (this.props.sim === 'pi') {
+            endPoint = 1
+            maxY = 1
+            startPoint = 0
+        }
         let x = Math.random() * (this.state.endPoint - this.state.startPoint)
         let y = Math.random() * this.state.maxy
         console.log(x, y)
         return [x, y];
     }
 
+    //AREA
     underCurve(x, y) {
         let res = this.f(x)
         console.log("result: " + res)
@@ -130,6 +173,12 @@ class AreaUnderCurve extends React.Component {
         if (y < res) console.log("under curve")
         else console.log("above curve")
         return (y < res)
+    }
+
+    //PI
+    insideCirc(x, y) {
+        let r = this.state.radius
+        return Math.pow(x - r, 2) + Math.pow(y - r, 2) < Math.pow(r, 2)
     }
 
 
@@ -140,6 +189,7 @@ class AreaUnderCurve extends React.Component {
         const node = this.node
         let randNums, randX, randY, innerCount = 0
         let totCount = 0
+        let included
         let i = this.state.numIter
 
         do {
@@ -150,18 +200,39 @@ class AreaUnderCurve extends React.Component {
             randNums = this.getRandXY()
             randX = randNums[0]
             randY = randNums[1]
-            let unCurve = this.underCurve(randX, randY)
+            //AREA
+            if (this.props.sim === 'pi') {
+                included = this.insideCirc(randX, randY)
+            }
 
-            if (unCurve) innerCount += 1
+            else {
+                included = this.underCurve(randX, randY)
+            }
+            if (included) innerCount += 1
+
+
+
             console.log(innerCount)
             this.setState({ innerCount: innerCount, totCount: totCount })
 
+            //some things changed for area
             if (this.state.run) {
-                select(node).append('circle')
-                    .attr('cx', randX / this.state.endPoint * this.props.width)
-                    .attr('cy', this.props.height - (randY / this.state.maxy) * this.props.height)
-                    .attr('r', 1.5)
-                    .style('fill', unCurve ? this.state.circleColor : this.state.squareColor);
+
+                if (this.props.sim === 'pi') {
+                    select(node).append('circle')
+                        .attr('cx', randX)
+                        .attr('cy', randY)
+                        .attr('r', 1.5)
+                        .style('fill', included ? this.state.circleColor : this.state.squareColor);
+
+                    this.setState({ pi: (4.0 * (innerCount / totCount)) })
+                }
+                else
+                    select(node).append('circle')
+                        .attr('cx', randX / this.state.endPoint * this.props.width)
+                        .attr('cy', this.props.height - (randY / this.state.maxy) * this.props.height)
+                        .attr('r', 1.5)
+                        .style('fill', included ? this.state.circleColor : this.state.squareColor);
 
                 //   this.setState({ pi: (4.0 * (innerCount / totCount)) })
             }
@@ -173,25 +244,28 @@ class AreaUnderCurve extends React.Component {
         this.setUp();
     }
 
+    //Import from another class
     render() {
         return (
             <div className="App">
-                <Typography id="header1" variant="h1" gutterBottom>Area Under Curve Simulation</Typography>
+                <Typography variant="h1" gutterBottom>{this.props.sim === 'pi' ? "Monte Carlo Pi Simulation" : "Area Under the Curve Simulation"}</Typography>
                 <div className="left-side">
                     <Typography variant="body2" gutterBottom>
-                        The area under the curve can be estimated by generating random points on the
-                        graph between 2 points, and calculating: 
+                        The value of Pi can be estimated by using a Monte Carlo Simulation.
+                        When we use a square with side length n and a circle with diameter n, and we generate
+                        random points inside the square, we can calculate the probability that
+                         the point will be inside the circle as:
         </Typography>
-                    <Typography className="center-bold" variant="body1" gutterBottom># points under curve / # total points</Typography>
-
-                    <Typography className="center-bold" variant="h6" gutterBottom>
-                        Total Under: {this.state.innerCount}
-                    </Typography>
-                    <Typography className="center-bold" variant="h6" gutterBottom>
-                        Total Points: {this.state.totCount}
+                    <Typography className="center-bold" variant="body1" gutterBottom>Pr(inside circle) = π/4</Typography>
+                    <Typography variant="body2" gutterBottom>
+                        Therefore, we can estimate Pi by calculating:
+        </Typography>
+                    <Typography className="center-bold" variant="body1" gutterBottom>π = 4 * (# inner points / # total points)</Typography>
+                    <Typography className="center-bold" variant="h5" gutterBottom>
+                        Total In: {this.state.innerCount}
                     </Typography>
                     <Typography className="center-bold" variant="h5" gutterBottom>
-                        Area Under Curve: {this.state.totCount != 0 ?(this.state.innerCount / this.state.totCount).toFixed(4) : 0}
+                        Total Out: {this.state.totCount}
                     </Typography>
                     <div className="inputs">
                         <div className="left-input">
@@ -236,4 +310,4 @@ class AreaUnderCurve extends React.Component {
     }
 }
 
-export default AreaUnderCurve;
+export default AppTwo;
