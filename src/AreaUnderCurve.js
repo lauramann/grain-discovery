@@ -17,7 +17,6 @@ class AreaUnderCurve extends React.Component {
             circleColor: '#ACD15A',
             innerCount: 0,
             totCount: 0,
-            // zoomFactor: 50,
             startPoint: 0,
             endPoint: 5,
             maxy: 0
@@ -32,6 +31,8 @@ class AreaUnderCurve extends React.Component {
         this.getRandXY = this.getRandXY.bind(this);
         this.f = this.f.bind(this);
         this.underCurve = this.underCurve.bind(this);
+        this.scaleX = this.scaleX.bind(this)
+        this.scaleY = this.scaleY.bind(this)
     }
 
     componentDidMount() {
@@ -51,6 +52,19 @@ class AreaUnderCurve extends React.Component {
         return Math.pow(x, Math.cos(x)) + 2
     }
 
+    scaleX(x){
+        x -= this.state.startPoint // offsets x to start at 0
+        x /= (this.state.endPoint - this.state.startPoint) // scales x to be a percentage
+        x *= this.props.width // scaled x to fill in the width of the frame
+        return x
+    }
+
+    scaleY(y, maxY){
+        y /= maxY // scales y to be a percentage
+        y *= this.props.height // scales y to fill the height of the frame
+        y = this.props.height - y // flips the y to start in the bottom left corner
+        return y
+    }
 
     setUp() {
         const node = this.node;
@@ -86,16 +100,12 @@ class AreaUnderCurve extends React.Component {
 
         this.setState({ maxy: maxY })
 
-        let f = this.f
+        let scaleX = this.scaleX
+        let scaleY = this.scaleY
 
-        let h = this.props.height
-
-        let xscale = 1 / this.state.endPoint * this.props.width
-        // let zoomFactor = this.state.zoomFactor
-        // this.props.height - (randY / this.state.maxy) * this.props.height
         let lineFunction = d3.line()
-            .x(function (d) { return (d.x * xscale); })
-            .y(function (d) { return h - d.y / maxY * h; })
+        .x(function (d) { return scaleX(d.x); })
+        .y(function (d) { return scaleY(d.y, maxY); })
 
         select(node).append("path")
             .attr("d", lineFunction(lineData))
@@ -117,7 +127,7 @@ class AreaUnderCurve extends React.Component {
     }
 
     getRandXY() {
-        let x = Math.random() * (this.state.endPoint - this.state.startPoint)
+        let x = Math.random() * (this.state.endPoint - this.state.startPoint) + this.state.startPoint
         let y = Math.random() * this.state.maxy
         console.log(x, y)
         return [x, y];
@@ -153,13 +163,17 @@ class AreaUnderCurve extends React.Component {
             let unCurve = this.underCurve(randX, randY)
 
             if (unCurve) innerCount += 1
+            
+            let rectArea = (this.state.endPoint - this.state.startPoint) * (this.state.maxy)
+            let auc = (rectArea) * innerCount / totCount
+
             console.log(innerCount)
-            this.setState({ innerCount: innerCount, totCount: totCount })
+            this.setState({ innerCount: innerCount, totCount: totCount, auc: auc })
 
             if (this.state.run) {
                 select(node).append('circle')
-                    .attr('cx', randX / this.state.endPoint * this.props.width)
-                    .attr('cy', this.props.height - (randY / this.state.maxy) * this.props.height)
+                .attr('cx', this.scaleX(randX))
+                .attr('cy', this.scaleY(randY, this.state.maxy))
                     .attr('r', 1.5)
                     .style('fill', unCurve ? this.state.circleColor : this.state.squareColor);
 
@@ -183,7 +197,9 @@ class AreaUnderCurve extends React.Component {
                         graph between 2 points, and calculating: 
         </Typography>
                     <Typography className="center-bold" variant="body1" gutterBottom># points under curve / # total points</Typography>
-
+                    <Typography className="center-bold" variant="body1" gutterBottom>
+                        Two points: ({this.state.startPoint}, 0), ({this.state.endPoint}, {this.state.maxy.toFixed(1)})
+        </Typography>
                     <Typography className="center-bold" variant="h6" gutterBottom>
                         Total Under: {this.state.innerCount}
                     </Typography>
@@ -191,7 +207,7 @@ class AreaUnderCurve extends React.Component {
                         Total Points: {this.state.totCount}
                     </Typography>
                     <Typography className="center-bold" variant="h5" gutterBottom>
-                        Area Under Curve: {this.state.totCount != 0 ?(this.state.innerCount / this.state.totCount).toFixed(4) : 0}
+                        Area Under Curve: {this.state.auc}
                     </Typography>
                     <div className="inputs">
                         <div className="left-input">
