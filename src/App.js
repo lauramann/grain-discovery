@@ -8,31 +8,31 @@ import ScrollableAnchor from 'react-scrollable-anchor'
 class App extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {pageToShow: ''}
+    this.state = { pageToShow: '' }
     this.handleClick = this.handleClick.bind(this);
   }
 
   handleClick(event) {
     console.log(event.target.id)
-    this.setState({pageToShow: event.target.id})
+    this.setState({ pageToShow: event.target.id })
   }
 
   render() {
     return (
       <div className="App">
         <div className="fab">
-        <Fab href="#auc" id="fab" color="primary" aria-label="Add">
-        
-        Next
+          <Fab href="#auc" id="fab" color="primary" aria-label="Add">
+
+            Next
       </Fab>
-      </div>
-      
+        </div>
+
         <PiEstimation width={500} height={500} />
 
         <ScrollableAnchor id={'auc'}>
-        <AreaUnderCurve id="auc" width={500} height={500} />
+          <AreaUnderCurve id="auc" width={500} height={500} />
         </ScrollableAnchor>
-        
+
       </div>
     );
   }

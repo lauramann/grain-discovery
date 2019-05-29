@@ -1,7 +1,7 @@
 import React from 'react';
 import { select } from 'd3-selection'
 import Slider from '@material-ui/lab/Slider';
-import {TextField, Button, Typography} from '@material-ui/core';
+import { TextField, Button, Typography } from '@material-ui/core';
 import './PiEstimation.css';
 
 class PiEstimation extends React.Component {
@@ -25,7 +25,7 @@ class PiEstimation extends React.Component {
     this.handleNumIterChange = this.handleNumIterChange.bind(this);
     this.getRandXY = this.getRandXY.bind(this);
     this.insideCirc = this.insideCirc.bind(this);
-    }
+  }
 
   componentDidMount() {
     this.setUp();
@@ -110,6 +110,8 @@ class PiEstimation extends React.Component {
 
       if (inCircle) innerCount += 1
 
+      this.setState({ innerCount: innerCount, totCount: totCount })
+
       if (this.state.run) {
         select(node).append('circle')
           .attr('cx', randX)
@@ -143,9 +145,16 @@ class PiEstimation extends React.Component {
             Therefore, we can estimate Pi by calculating:
       </Typography>
           <Typography className="center-bold" variant="body1" gutterBottom>π = 4 * (# inner points / # total points)</Typography>
+          <Typography className="center-bold" variant="h6" gutterBottom>
+            Total Under: {this.state.innerCount}
+          </Typography>
+          <Typography className="center-bold" variant="h6" gutterBottom>
+            Total Points: {this.state.totCount}
+          </Typography>
           <Typography className="center-bold" variant="h5" gutterBottom>
             π : {this.state.pi.toFixed(4)}
           </Typography>
+
           <div className="inputs">
             <div className="left-input">
               <TextField

@@ -19,7 +19,8 @@ class AreaUnderCurve extends React.Component {
             totCount: 0,
             startPoint: 0,
             endPoint: 5,
-            maxy: 0
+            maxy: 0,
+            auc: 0
         };
 
         this.setUp = this.setUp.bind(this);
@@ -47,19 +48,20 @@ class AreaUnderCurve extends React.Component {
         this.setState({ numIter: event.target.value })
     }
 
+    //Option to change function
     f(x) {
         // return Math.pow(x, 2)
         return Math.pow(x, Math.cos(x)) + 2
     }
 
-    scaleX(x){
+    scaleX(x) {
         x -= this.state.startPoint // offsets x to start at 0
         x /= (this.state.endPoint - this.state.startPoint) // scales x to be a percentage
         x *= this.props.width // scaled x to fill in the width of the frame
         return x
     }
 
-    scaleY(y, maxY){
+    scaleY(y, maxY) {
         y /= maxY // scales y to be a percentage
         y *= this.props.height // scales y to fill the height of the frame
         y = this.props.height - y // flips the y to start in the bottom left corner
@@ -72,8 +74,6 @@ class AreaUnderCurve extends React.Component {
 
         const d = Math.min(this.props.height, this.props.width);
         const r = d / 2;
-        //   const cx = this.props.width / 2;
-        //   const cy = this.props.height / 2;
 
         this.setState({ radius: r })
 
@@ -104,8 +104,8 @@ class AreaUnderCurve extends React.Component {
         let scaleY = this.scaleY
 
         let lineFunction = d3.line()
-        .x(function (d) { return scaleX(d.x); })
-        .y(function (d) { return scaleY(d.y, maxY); })
+            .x(function (d) { return scaleX(d.x); })
+            .y(function (d) { return scaleY(d.y, maxY); })
 
         select(node).append("path")
             .attr("d", lineFunction(lineData))
@@ -163,7 +163,7 @@ class AreaUnderCurve extends React.Component {
             let unCurve = this.underCurve(randX, randY)
 
             if (unCurve) innerCount += 1
-            
+
             let rectArea = (this.state.endPoint - this.state.startPoint) * (this.state.maxy)
             let auc = (rectArea) * innerCount / totCount
 
@@ -172,12 +172,10 @@ class AreaUnderCurve extends React.Component {
 
             if (this.state.run) {
                 select(node).append('circle')
-                .attr('cx', this.scaleX(randX))
-                .attr('cy', this.scaleY(randY, this.state.maxy))
+                    .attr('cx', this.scaleX(randX))
+                    .attr('cy', this.scaleY(randY, this.state.maxy))
                     .attr('r', 1.5)
                     .style('fill', unCurve ? this.state.circleColor : this.state.squareColor);
-
-                //   this.setState({ pi: (4.0 * (innerCount / totCount)) })
             }
         } while (this.state.run && i)
     }
@@ -194,7 +192,7 @@ class AreaUnderCurve extends React.Component {
                 <div className="left-side">
                     <Typography variant="body2" gutterBottom>
                         The area under the curve can be estimated by generating random points on the
-                        graph between 2 points, and calculating: 
+                        graph between 2 points, and calculating:
         </Typography>
                     <Typography className="center-bold" variant="body1" gutterBottom># points under curve / # total points</Typography>
                     <Typography className="center-bold" variant="body1" gutterBottom>
@@ -207,7 +205,7 @@ class AreaUnderCurve extends React.Component {
                         Total Points: {this.state.totCount}
                     </Typography>
                     <Typography className="center-bold" variant="h5" gutterBottom>
-                        Area Under Curve: {this.state.auc}
+                        Area Under Curve: {this.state.auc.toFixed(4)}
                     </Typography>
                     <div className="inputs">
                         <div className="left-input">
